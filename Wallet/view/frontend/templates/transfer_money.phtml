@@ -1,0 +1,87 @@
+<?php
+/** @var NewMagentoAssignment\Wallet\Block\TransferMoney $block */
+$walletBalance = $block->getWalletBalance();
+$customers = $block->getAllCustomers();
+$transferUrl = $block->getTransferUrl();
+?>
+
+<h1>My Wallet</h1>
+
+<!-- Wallet Balance Display -->
+<div class="wallet-balance">
+    <p>Your Wallet Balance: <strong><?= number_format($walletBalance, 2) ?> </strong></p>
+</div>
+
+<!-- Transfer Money Form -->
+<form action="<?= $transferUrl ?>" method="post" class="wallet-transfer-form" data-mage-init='{"validation": {}}'>
+    <input type="hidden" name="form_key" value="<?= $block->getFormKey() ?>" />
+
+    <!-- Recipient Selection -->
+    <div class="form-group">
+        <label for="recipient">Select Recipient:</label>
+        <select name="recipient_id" id="recipient" class="validate-select" required>
+            <option value="">-- Select Recipient --</option>
+            <?php foreach ($customers as $customer): ?>
+                <option value="<?= $customer['id'] ?>">
+                    <?= htmlspecialchars($customer['name']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+    <!-- Amount Field -->
+    <div class="form-group">
+        <label for="amount">Amount to Transfer:</label>
+        <input type="number" name="amount" id="amount" class="validate-number validate-greater-than-zero" data-validate='{"required":true, "min":1, "max": <?= $walletBalance ?>}' />
+        <small id="amount-error" style="color: red; display: none;">Amount must be between 1 and <?= number_format($walletBalance, 2) ?></small>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Transfer Money</button>
+    </div>
+</form>
+
+<script>
+    require(['jquery', 'mage/validation'], function($){
+        $('#amount').on('input', function() {
+            let value = parseFloat($(this).val());
+            let maxAmount = <?= $walletBalance ?>;
+            if (value > maxAmount || value <= 0) {
+                $('#amount-error').show();
+            } else {
+                $('#amount-error').hide();
+            }
+        });
+    });
+</script>
+
+
+<style>
+    .wallet-transfer-form {
+        max-width: 400px;
+        margin: 20px 0;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: bold;
+    }
+    .form-group input, .form-group select {
+        width: 100%;
+        margin-top: 5px;
+    }
+    button.btn-primary {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button.btn-primary:hover {
+        background-color: #0056b3;
+    }
+</style>

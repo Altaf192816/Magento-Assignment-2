@@ -1,0 +1,23 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:App/Config/Schema/config.xsd">
+    <default>
+        <payment>
+            <custompayment>
+                <active>1</active>
+                <title>Wallet Payment</title>
+                <model>NewMagentoAssignment\Wallet\Model\PaymentMethod</model>
+                <order_status>pending</order_status>
+                <is_gateway>1</is_gateway>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_refund>1</can_refund>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <can_refund_invoice_partial>1</can_refund_invoice_partial>
+                <can_use_for_multishipping>0</can_use_for_multishipping>
+                <sort_order>100</sort_order>
+                <payment_action>authorize_capture</payment_action>
+            </custompayment>
+        </payment>
+    </default>
+</config>

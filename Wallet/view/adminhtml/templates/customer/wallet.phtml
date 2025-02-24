@@ -1,0 +1,198 @@
+<?php /** @var NewMagentoAssignment\Wallet\Block\Adminhtml\Customer\Edit\Tab $block */ ?>
+<?php $walletBalance = $block->getCustomerWalletBalance('walletBalance'); ?>
+
+<div class="admin__field">
+    <label class="admin__field-label"><span class="admin__field-label-text"><?= __('Wallet Balance') ?></span></label>
+    <div class="admin__field-control">
+        <strong id="walletBalance" data-wallet-balance="<?= $walletBalance ?>">
+            <?= $block->escapeHtml($walletBalance) ?> <?= __('Credits') ?>
+        </strong>
+    </div>
+
+    <label class="admin__field-label"><span
+            class="admin__field-label-text"><?= __('Transaction Operations') ?></span></label>
+    <div>
+        <label class="label" for="transaction_operations">Type:</label>
+        <select id="transaction_operations">
+            <option value="add_money">Credit</option>
+            <option value="deduct_money">Debit</option>
+            <option value="transfer_money">Transfer</option>
+        </select>
+    </div>
+
+    <!--Add Money Form-->
+    <div class="add_money tab">
+        <form id="wallet-add-money-form" action="<?= $block->getAddMoneyUrl(); ?>" method="post">
+            <input type="hidden" name="form_key" value="<?= $block->getFormKey(); ?>">
+            <div class="field">
+                <label class="label" for="add_amount">Enter Amount:</label>
+                <input type="number" id="add_amount" name="amount"
+                       data-validate="{required:true, 'validate-number':true, 'min':1}"
+                       data-wallet-check="true"/>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="number" value="<?= $block->getCustomerId() ?>" name="id" style="display: none"/>
+                </label>
+            </div>
+            <div class="actions">
+                <button type="submit" id="add-money-btn" class="action-primary">Add Money</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Deduct Money Form -->
+    <div class="deduct_money tab">
+        <form id="wallet-remove-money-form" action="<?= $block->getDeductMoneyUrl(); ?>" method="post">
+            <input type="hidden" name="form_key" value="<?= $block->getFormKey(); ?>">
+            <div class="field">
+                <label class="label" for="deducted_amount">Enter Amount:</label>
+                <input type="number" id="deducted_amount" name="amount"
+                       data-validate="{required:true, 'validate-number':true, 'min':1}"
+                       data-wallet-check="true"/>
+            </div>
+            <div class="actions">
+                <button type="submit" id="remove-money-btn" class="action-primary">Deduct Money</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Transfer Money Form -->
+    <div class="transfer_money tab">
+        <form method="post" action="<?= $block->getTransferMoneyUrl(); ?>" class="wallet-transfer-form">
+            <input type="hidden" name="form_key" value="<?= $block->getFormKey() ?>"/>
+            <div class="form-group">
+                <label class="label" for="recipient">Select Recipient:</label>
+                <select name="recipient_id" id="recipient" required
+                        data-validate="{required:true}">
+                    <option value="">-- Select Recipient --</option>
+                    <?php foreach ($block->getAllCustomers() as $customer): ?>
+                        <option value="<?= $customer['id'] ?>">
+                            <?= htmlspecialchars($customer['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="label" for="transfer_amount">Amount to Transfer:</label>
+                <input type="number" name="amount" id="transfer_amount"
+                       data-validate="{required:true, 'validate-number':true, 'min':1}"
+                       data-wallet-check="true"/>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="action-primary">Transfer Money</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .tab {
+        display: none;
+        margin-top: 16px;
+    }
+
+    .admin__field-control {
+        margin-bottom: 16px;
+    }
+
+    .admin__field-label-text {
+        font-size: 3rem;
+        margin-bottom: 16px;
+    }
+
+    .admin__field-control {
+        font-size: 2rem;
+        color: green;
+    }
+
+    .wallet-transfer-form {
+        max-width: 400px;
+        margin: 20px 0;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .label {
+        font-weight: bold;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        margin-top: 5px;
+    }
+</style>
+
+<script type="text/javascript">
+    require([
+        'jquery',
+        'mage/mage',
+        'mage/validation'
+    ], function ($) {
+        $(document).ready(function () {
+            // Get wallet balance from the HTML element
+            const walletBalance = parseFloat($('#walletBalance').data('wallet-balance')) || 0;
+
+            // Custom validation rule to check if amount exceeds wallet balance
+            $.validator.addMethod(
+                "walletLimit",
+                function (value, element) {
+                    const amount = parseFloat(value);
+                    return amount <= walletBalance;
+                },
+                "Entered amount exceeds available wallet balance!"
+            );
+
+            // Apply Magento validation to forms
+            $('#wallet-remove-money-form, .wallet-transfer-form, #wallet-add-money-form').mage('validation');
+
+            // Attach validation to the Deduct Money and Transfer Money fields
+            $('#deducted_amount, #transfer_amount').attr('data-validate', JSON.stringify({
+                required: true,
+                'validate-number': true,
+                'min': 1,
+                walletLimit: true
+            }));
+
+            // Handle tab switching
+            const selectEl = $("#transaction_operations");
+            const allTabs = $(".tab");
+
+            function showTab(selectedTab) {
+                allTabs.hide();
+                $("." + selectedTab).show();
+            }
+
+            // Show default selected tab
+            showTab(selectEl.val());
+
+            selectEl.on("change", function () {
+                showTab($(this).val());
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

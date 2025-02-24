@@ -1,0 +1,54 @@
+<?php
+/** @var NewMagentoAssignment\Wallet\Block\Transactions $block */
+$transactions = $block->getCustomerTransactions();
+?>
+
+<table class="wallet-transactions">
+    <thead>
+    <tr>
+        <th>Transaction ID</th>
+        <th>Amount</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>View Transaction</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php if ($transactions && $transactions->getSize()): ?>
+        <?php foreach ($transactions as $transaction): ?>
+            <tr>
+                <td><?= $block->escapeHtml($transaction->getId()) ?></td>
+                <td><?= $block->escapeHtml($transaction->getAmount()) ?></td>
+                <td><?= $block->escapeHtml(ucfirst($transaction->getTransactionType())) ?></td>
+                <td><?= $block->escapeHtml(ucfirst($transaction->getTransactionStatus())) ?></td>
+                <td><?= $block->escapeHtml($transaction->getCreatedAt()) ?></td>
+                <td><a href="/wallet/index/transactiondetail/id/<?= $transaction->getId()?>">View Transaction</a> </td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="5">No transactions found.</td>
+        </tr>
+    <?php endif; ?>
+    </tbody>
+</table>
+
+<!-- Pagination Block -->
+<?php if ($pager = $block->getPager()): ?>
+    <div class="wallet-transactions-pager">
+        <?= $pager->toHtml() ?>
+    </div>
+<?php endif; ?>
+
+<style>
+    table, th, td {
+        border: 1px solid;
+    }
+
+    .wallet-transactions {
+        margin-bottom: 50px;
+        border-collapse: collapse;
+    }
+</style>
+

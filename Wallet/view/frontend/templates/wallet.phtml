@@ -1,0 +1,116 @@
+<?php
+/** @var NewMagentoAssignment\Wallet\Block\Wallet $block */
+$walletBalance = $block->getWalletBalance();
+$minAmount = $block->getMinAmount();
+$maxAmount = $block->getMaxAmount();
+?>
+
+<h1>My Wallet</h1>
+
+<!-- Wallet Balance Display -->
+<div class="wallet-balance">
+    <p>Your Wallet Balance: <strong><?= $walletBalance ?> </strong></p>
+</div>
+
+<!-- OTP Add Money Form -->
+<form id="wallet-add-money-form" style="display: none" action="<?= $block->getAddMoneyUrl(); ?>" method="post">
+    <input type="hidden" name="form_key" value="<?= $block->getFormKey(); ?>">
+    <div class="field">
+        <label for="amount">Enter Amount:</label>
+        <input type="number" class="amount" id="amount" name="amount"
+               data-validate='{"required":true, "validate-number":true, "min": <?= $minAmount ?>, "max": <?= $maxAmount ?>}' />
+    </div>
+    <div class="field">
+        <button type="button" id="request-otp">Request OTP</button>
+    </div>
+    <div class="field otp-field" style="display:none;">
+        <label for="otp">Enter OTP:</label>
+        <input type="text" id="otp" name="otp" data-validate='{"required":true}' />
+    </div>
+    <div class="actions">
+        <button type="submit" id="add-money-btn" disabled>Add Money</button>
+    </div>
+</form>
+
+<!-- Add Money Form Without OTP -->
+<form id="wallet-add-money-form-without-otp" style="display: none" action="<?= $block->getAddMoneyUrl(); ?>" method="post" data-mage-init='{"validation":{}}'>
+    <input type="hidden" name="form_key" value="<?= $block->getFormKey(); ?>">
+    <div class="field">
+        <label for="amount">Enter Amount:</label>
+        <input type="number" class="amount" id="amount" name="amount"
+               data-validate='{"required":true, "validate-number":true, "min": <?= $minAmount ?>, "max": <?= $maxAmount ?>}' />
+    </div>
+    <div class="actions">
+        <button type="submit" id="add-money-btn">Add Money</button>
+    </div>
+</form>
+
+<script type="text/javascript">
+    require(['jquery', 'mage/mage'], function ($) {
+        $(document).ready(function () {
+            const isOtpEnabled = "<?= $block->isOtpEnabled() ?>";
+            if (isOtpEnabled === "1") {
+                $("#wallet-add-money-form").show();
+                const otpField = $(".otp-field");
+                const otpInput = $("#otp");
+                const addMoneyBtn = $("#add-money-btn");
+                const requestOtpBtn = $("#request-otp");
+
+                requestOtpBtn.on("click", function () {
+                    const formKey = $('input[name="form_key"]').val();
+
+                    if ($("#wallet-add-money-form").valid()) {
+                        requestOtpBtn.prop("disabled", true).text("Requesting...");
+
+                        $.ajax({
+                            url: "<?= $block->getOtpRequestUrl() ?>",
+                            type: "POST",
+                            data: { form_key: formKey },
+                            dataType: "json",
+                            success: function (data) {
+                                requestOtpBtn.prop("disabled", false).text("Request OTP");
+
+                                if (data.success) {
+                                    otpField.show();
+                                    addMoneyBtn.prop("disabled", false);
+                                }
+                            },
+                            error: function () {
+                                requestOtpBtn.prop("disabled", false).text("Request OTP");
+                            }
+                        });
+                    }
+                });
+
+                otpInput.on("input", function () {
+                    addMoneyBtn.prop("disabled", otpInput.val().trim() === "");
+                });
+            } else {
+                $("#wallet-add-money-form-without-otp").show();
+            }
+
+            // Initialize Magento validation
+            $("#wallet-add-money-form, #wallet-add-money-form-without-otp").mage('validation', {});
+        });
+    });
+</script>
+
+<style>
+    .wallet-balance {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    .field {
+        margin-bottom: 15px;
+    }
+    .actions button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+    }
+    .actions button:hover {
+        background-color: #0056b3;
+    }
+</style>

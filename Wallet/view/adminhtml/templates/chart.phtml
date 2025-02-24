@@ -1,0 +1,100 @@
+<?php /** @var NewMagentoAssignment\Wallet\Block\Adminhtml\Chart $block */ ?>
+
+<!-- Date Range Inputs -->
+<form id="wallet_filter_form" data-mage-init='{"validation":{}}'
+      style="display: flex; flex-direction: column; width: min-content">
+    <label for="start_date">Start Date:</label>
+    <input type="date" id="start_date" name="start_date" class="admin__control-text required-entry"
+           />
+    <div id="start_date-error" class="mage-error" style="display: none; color: red;"></div>
+
+    <label for="end_date">End Date:</label>
+    <input type="date" id="end_date" name="end_date" class="admin__control-text required-entry"
+          />
+    <div id="end_date-error" class="mage-error" style="display: none; color: red;"></div>
+
+    <div id="validation-errors" style="color: red;"></div>
+    <button style="margin-top: 16px" type="button" id="filter_btn" class="action-primary">Filter</button>
+</form>
+
+<canvas id="myChart"></canvas>
+
+<script>
+    require(['jquery', 'chartjs', 'mage/validation'], function ($, Chart) {
+        $(document).ready(function () {
+            let chartInstance = null;
+            const today = new Date().toISOString().split('T')[0];
+
+            // Apply Magento validation
+            $('#wallet_filter_form').validation();
+
+            // Restrict max date for end date
+            $('#end_date').attr('max', today);
+
+            function loadChart(startDate, endDate) {
+                $.ajax({
+                    url: '<?php echo $block->getUrl("wallet/index/filter"); ?>',
+                    type: 'GET',
+                    data: { start_date: startDate, end_date: endDate },
+                    success: function (response) {
+                        const transactionData = response;
+                        const labels = transactionData.map(item => item.date);
+                        const amounts = transactionData.map(item => parseFloat(item.total_amount));
+
+                        const ctx = document.getElementById('myChart').getContext('2d');
+
+                        if (chartInstance !== null) {
+                            chartInstance.destroy();
+                        }
+
+                        chartInstance = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Total Transactions',
+                                    data: amounts,
+                                    backgroundColor: '#ffbb9f',
+                                    borderColor: '#eb5202',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Load initial chart data
+            loadChart('', '');
+
+            // Validate before filtering
+            $('#filter_btn').click(function () {
+                const form = $('#wallet_filter_form');
+
+                // Validate form
+                if (form.valid()) {
+                    const startDate = $('#start_date').val();
+                    const endDate = $('#end_date').val();
+
+                    // Validate date logic
+                    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                        $('#validation-errors').text('Start date must be before or equal to end date.').show();
+                    } else if (endDate && new Date(endDate) > new Date(today)) {
+                        $('#validation-errors').text('End date cannot be greater than today’s date.').show();
+                    } else {
+                        $('#validation-errors').text('').hide();
+                        loadChart(startDate, endDate);
+                    }
+                }
+            });
+        });
+    });
+</script>

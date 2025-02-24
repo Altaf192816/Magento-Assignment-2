@@ -1,0 +1,21 @@
+<!--@subject Amount Added @-->
+
+{{template config_path="design/email/header_template"}}
+<table>
+    <tr>
+        <td>
+            Name: {{var customer_name}}
+        </td>
+        <td>
+            Email: {{var transaction_type}}
+        </td>
+        <td>
+            Amount: {{var amount}}
+        </td>
+        <td>
+            Status: {{var transaction_status}}
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}
