@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="add_money_email_template" label="Email Form" file="addmoney_email.html" type="html"
+              module="NewMagentoAssignment_Wallet" area="frontend"/>
+    <template id="add_money_otp_email_template" label="Otp Email Form" file="wallet_otp_email.html" type="html"
+              module="NewMagentoAssignment_Wallet" area="frontend"/>
+    <template id="cashback_reward_email" label="Reward Email Form" file="reward_email.html" type="html"
+              module="NewMagentoAssignment_Wallet" area="frontend"/>
+    <template id="order_refund_email" label="Reward Email Form" file="refund_email.html" type="html"
+              module="NewMagentoAssignment_Wallet" area="frontend"/>
+    <template id="wallet_report_email_template" label="Otp Email Form" file="wallet_report_email_template.html"
+              type="html" module="NewMagentoAssignment_Wallet" area="backend"/>
+</config>

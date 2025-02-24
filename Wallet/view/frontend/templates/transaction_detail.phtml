@@ -1,0 +1,14 @@
+<?php
+/** @var NewMagentoAssignment\Wallet\Block\Transaction $block */
+$transaction = $block->getTransaction();
+if ($transaction && $transaction->getId()) : ?>
+    <h2>Transaction Details</h2>
+    <p><strong>Transaction ID:</strong> <?= $transaction->getId() ?></p>
+    <p><strong>Amount:</strong> <?= $block->escapeHtml($transaction->getAmount()) ?></p>
+    <p><strong>Type:</strong> <?= $block->escapeHtml($transaction->getTransactionType()) ?></p>
+    <p><strong>Status:</strong> <?= $block->escapeHtml($transaction->getTransactionStatus()) ?></p>
+    <p><strong>Remark:</strong> <?= $block->escapeHtml($transaction->getRemarks()) ?></p>
+    <p><strong>Date:</strong> <?= $block->escapeHtml($transaction->getCreatedAt()) ?></p>
+<?php else : ?>
+    <p>Transaction not found.</p>
+<?php endif; ?>

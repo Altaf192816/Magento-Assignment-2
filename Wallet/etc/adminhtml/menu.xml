@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="NewMagentoAssignment_Wallet::wallet"
+             title="Wallet"
+             module="NewMagentoAssignment_Wallet"
+             sortOrder="10"
+             resource="NewMagentoAssignment_Wallet::Wallet"/>
+        <add id="NewMagentoAssignment_Wallet::configurations"
+             title="Wallets Information"
+             module="NewMagentoAssignment_Wallet"
+             parent="NewMagentoAssignment_Wallet::wallet"
+             action="wallet/index/index"
+             sortOrder="10"
+             resource="NewMagentoAssignment_Wallet::wallet"/>
+        <add id="NewMagentoAssignment_Wallet::customer_detail"
+             title="Wallet Usage Chart"
+             module="NewMagentoAssignment_Wallet"
+             parent="NewMagentoAssignment_Wallet::wallet"
+             action="wallet/index/chart"
+             sortOrder="11"
+             resource="NewMagentoAssignment_Wallet::wallet"/>
+    </menu>
+</config>
